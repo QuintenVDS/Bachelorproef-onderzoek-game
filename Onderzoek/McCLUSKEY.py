@@ -117,12 +117,12 @@ def mcCluskey(canExp):
             for term1 in table[i]:
                 for term2 in table[i + 1]:
                     differ = term1.differAt(term2)
-                    if len(differ) == 1:
+                    if len(differ) == 1:          
                         term12 = reduce(term1, term2, differ[0])
                         newTerms.removeTerm(term1)
                         newTerms.removeTerm(term2)
-                        newTerms.appendTerm(term12)
-        if newTerms.equal(canExp):
+                        newTerms.appendTerm(term12) 
+        if newTerms.equal(canExp):              #Als er geen nieuwe termen zijn toegevoegd, stop de while loop
             newIter = False
         return canExp
 
@@ -145,7 +145,8 @@ def reduce(term1, term2, i):
         if j == i:
             varlist.append(-1)
         else:
-            varlist.append(term1.term[1])
+            varlist.append(term1.term[j])
+    return Pterm(varlist)
 
 #################
 #   Testcases   #
