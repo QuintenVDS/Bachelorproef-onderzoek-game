@@ -39,43 +39,101 @@ class Pterm:
                 differ.append[i]
         return differ
 
-def test():
-    p1 = Pterm([1,0,-1,1,0,0])
-    p2 = Pterm([1,0,-1,1,0,1])
-    assert p1.length == 6
-    p1.set_var(5,1)
-    assert p1.equal(p2)
-    assert p1.set_var(4,3) == 0
-    assert p1.set_var(6,1) == 0
+    def __copy__(self):
+        return Pterm(self.term.copy())
 
-def main():
-    test()
+    def __str__(self):
+        res = ""
+        for i in range(self.length):
+            if self.term[i] == 1:
+                res += "x{} ".format(str(i+1))
+            elif self.term[i] == 0:
+                res += "x{}' ".format(str(i+1))
+        return res
 
-main()
+#########################
+#   Logic expressions   #
+#########################
+
+class LExp:
+    def __init__(self, PTerms):
+        for pterm in PTerms:
+            assert type(pterm) == Pterm
+        self.terms = PTerms
+
+    def changeTerm(self, term, i, ni):
+        self.terms.remove(term)
+        newTerm = term.set_var(i, ni)
+        self.setTerms(self, self.terms.append(newTerm))
+
+    def setTerms(self, nterms):
+        self.terms = nterms
+
+    def removeTerm(self, term):
+        newTerms = self.terms.remove(term)
+        self.setTerms(newTerms)
+
+    def appendTerm(self, term):
+        newTerms = self.terms.append(term)
+        self.setTerms(newTerms)
+
+    def equal(self, other):
+        if type(other) != Pterm:
+            return False
+        if len(self.terms) != len(other.terms):
+            return False
+        for i in self.terms:
+            found = False
+            for j in other.terms:
+                if i.equal(j):
+                    found = True
+            if found == False:
+                return False
+        return True
+
+    def deepcopyExp(self):
+        res = []
+        for i in self.terms:
+            newTerm = i.__copy__()
+            res.append(newTerm)
+        return LExp(res)
+
+    def __str__(self):
+        res = ""
+        for i in range(len(self.terms)):
+            res += "{} +".format(self.terms[i])
+
 #################
 #   Algoritme   #
 #################
 
 def mcCluskey(canExp):
-    table = makeSortedDict(canExp)      #Sorteer elementen op het aantal eentjes
-    i = 0
-    while i < len(table):
-        for term1 in table[i]:
-            for term2 in table[i + 1]:
-                differ = term1.differAt(term2)
-                if len(differ) == 1:
-                    term12 = reduce(term1, term2, differ[0])
+    newIter = True
+    while newIter:
 
-
+        table = makeSortedDict(canExp)      #Sorteer elementen op het aantal eentjes
+        newTerms = canExp.deepcopyExp()
+        for i in range(len(table)):
+            for term1 in table[i]:
+                for term2 in table[i + 1]:
+                    differ = term1.differAt(term2)
+                    if len(differ) == 1:
+                        term12 = reduce(term1, term2, differ[0])
+                        newTerms.removeTerm(term1)
+                        newTerms.removeTerm(term2)
+                        newTerms.appendTerm(term12)
+        if newTerms.equal(canExp):
+            newIter = False
+        return canExp
 
 def makeSortedDict(canExp):
     res = dict()
     for i in canExp:
         counti = i.countOnes()
         if counti not in res:
-            dict[counti] = [i]
+            res[counti] = [i]
         else:
-            dict[counti].add(i)
+            res[counti].add(i)
     return res
 
 def reduce(term1, term2, i):
@@ -92,3 +150,23 @@ def reduce(term1, term2, i):
 #################
 #   Testcases   #
 #################
+
+def test():
+    p1 = Pterm([1,0,-1,1,0,0])
+    p2 = Pterm([1,0,-1,1,0,1])
+    assert p1.length == 6
+    p1.set_var(5,1)
+    assert p1.equal(p2)
+    assert p1.set_var(4,3) == 0
+    assert p1.set_var(6,1) == 0
+    p1c = p1.__copy__()
+    assert p1c != p1
+    assert p1c.equal(p1)
+
+
+def main():
+    print(Pterm([1,0,-1,1]))
+    print(LExp([Pterm([1,0]),Pterm([1,1])]))
+    test()
+
+main()
