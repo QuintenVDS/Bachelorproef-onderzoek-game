@@ -21,6 +21,7 @@ def make_pterm(aantalVariabelen): # make a random pterm
     for i in range(0, aantalVariabelen):
         randomIndex = random.randint(0, 2)
         pterm.append(PVAR[randomIndex])
+    return Pterm(pterm)
    
 def main():
     Expression = generator()
