@@ -70,15 +70,20 @@ class LExp:
         self.terms = nterms
 
     def removeTerm(self, term):
-        newTerms = self.terms.remove(term)
-        self.setTerms(newTerms)
+        self.terms
+        for origterm in self.terms:
+            if origterm.equal(term):
+                self.terms.remove(origterm)
+                break
+        return self.deepcopyExp()
 
     def appendTerm(self, term):
-        newTerms = self.terms.append(term)
-        self.setTerms(newTerms)
+        self.terms.append(term)
+        return self.deepcopyExp()
+
 
     def equal(self, other):
-        if type(other) != Pterm:
+        if type(other) != LExp:
             return False
         if len(self.terms) != len(other.terms):
             return False
@@ -101,7 +106,11 @@ class LExp:
     def __str__(self):
         res = ""
         for i in range(len(self.terms)):
-            res += "{} +".format(self.terms[i])
+            if i != len(self.terms) - 1:
+                res += "{}+ ".format(self.terms[i])
+            else:
+                res += "{}".format(self.terms[i])
+        return res
 
 #################
 #   Algoritme   #
@@ -145,7 +154,8 @@ def reduce(term1, term2, i):
         if j == i:
             varlist.append(-1)
         else:
-            varlist.append(term1.term[1])
+            varlist.append(term1.term[i])
+    return Pterm(varlist)
 
 #################
 #   Testcases   #
@@ -162,7 +172,17 @@ def test():
     p1c = p1.__copy__()
     assert p1c != p1
     assert p1c.equal(p1)
-
+    exp1 = LExp([Pterm([1,0]),Pterm([1,1])])
+    exp2 = LExp([Pterm([1,-1]),Pterm([1,0])])
+    exp3 = LExp([Pterm([1,1]),Pterm([1,0])])
+    exp1c = exp1.deepcopyExp()
+    assert exp1 != exp1c
+    assert exp1.terms != exp1c.terms
+    assert exp1.equal(exp3)
+    assert not exp1.equal(exp2)
+    exp4 = LExp([Pterm([1,0]),Pterm([1,1]),Pterm([1,-1])])
+    assert exp4.equal(exp1.appendTerm(Pterm([1,-1])))
+    assert exp2.equal(exp1.removeTerm(Pterm([1,1])))
 
 def main():
     print(Pterm([1,0,-1,1]))
