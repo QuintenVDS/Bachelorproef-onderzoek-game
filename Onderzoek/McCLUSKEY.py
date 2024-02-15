@@ -56,7 +56,7 @@ class Pterm:
 #########################
 
 class LExp:
-    def __init__(self, PTerms):
+    def __init__(self, PTerms):    #PTerms is een lijst van p-termen
         for pterm in PTerms:
             assert type(pterm) == Pterm
         self.terms = PTerms
