@@ -15,9 +15,7 @@ PVAR = [-1, 0, 1]
 class Pterm:
     def __init__(self, varlist):  # GETEST
         for i in varlist:
-            if i not in PVAR:
-                print("exception")
-                return 0
+            assert i in PVAR
         self.term = varlist
         self.length = len(varlist)
 
@@ -70,7 +68,6 @@ class LExp:
         for pterm in PTerms:
             assert type(pterm) == Pterm
         self.terms = PTerms
-        self.varCount = PTerms[0].length
 
     def changeTerm(self, term, i, ni):
         self.removeTerm(term)
@@ -88,7 +85,7 @@ class LExp:
     def appendTerm(self, term):  # GETEST
         self.terms.append(term)
 
-    def containsTerm(self, term):
+    def containsTerm(self, term):  # GETEST
         found = False
         for origterm in self.terms:
             if origterm.equal(term):
@@ -102,11 +99,7 @@ class LExp:
         if len(self.terms) != len(other.terms):
             return False
         for i in self.terms:
-            found = False
-            for j in other.terms:
-                if i.equal(j):
-                    found = True
-            if found == False:
+            if not other.containsTerm(i):
                 return False
         return True
 
@@ -131,14 +124,14 @@ class LExp:
 #   Algoritme   #
 #################
 
-def mcCluskey(canExp):
+def mcCluskey(canExp):  # GETEST
     newIter = True
     while newIter:
         table = makeTable(canExp.terms)  # Sorteer elementen op het aantal eentjes
         newTerms = canExp.deepcopyExp()
         for i in table:
             for term1 in table[i]:
-                if i+1 in table:
+                if i + 1 in table:
                     for term2 in table[i + 1]:
                         differ = term1.differAt(term2)
                         if len(differ) == 1:
@@ -226,10 +219,12 @@ def test():
     assert dict[0][0].equal(Pterm([0, -1]))
     assert dict[1][0].equal(Pterm([1, 0]))
     assert dict[2][0].equal(Pterm([1, 1]))
-    expTest1 = LExp([Pterm([1,1]), Pterm([1,0])])
-    assert mcCluskey(expTest1).equal(LExp([Pterm([1,-1])]))
-    expTest2 = LExp([Pterm([0,1,0]), Pterm([1,1,1]), Pterm([1,1,0]), Pterm([0,1,1]), Pterm([1,0,0])])
+    expTest1 = LExp([Pterm([1, 1]), Pterm([1, 0])])
+    assert mcCluskey(expTest1).equal(LExp([Pterm([1, -1])]))
+    expTest2 = LExp([Pterm([0, 1, 0]), Pterm([1, 1, 1]), Pterm([1, 1, 0]), Pterm([0, 1, 1]), Pterm([1, 0, 0])])
     print("McCLUSKEY op het voorbeeld dat wij altijd hebben gebruikt: \n {}".format(mcCluskey(expTest2)))
+
+
 def main():
     test()
 
