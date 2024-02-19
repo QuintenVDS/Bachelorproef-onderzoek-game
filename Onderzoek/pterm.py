@@ -35,7 +35,7 @@ class Pterm:
             return 0
         res = []
         for i in range(self.length):
-            if self.term[i] != term2.term[i]:
+            if self.term[i] != term2.term[i] and (self.term[i] == 1 or term2.term[i] == 1) and (self.term[i] == 0 or term2.term[i] == 0):
                 res.append(i)
         return res
 
