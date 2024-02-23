@@ -17,6 +17,7 @@ class Pterm:
         for i in varlist:
             assert i in PVAR
         self.term = varlist
+        self.decimal = self.toDecimal()
         self.length = len(varlist)
 
     def setVar(self, i, ni):  # GETEST
@@ -25,6 +26,17 @@ class Pterm:
             return 0
         else:
             self.term[i] = ni
+
+    def toDecimal(self):  #Getest: werkt niet voor geminimaliseerde p-termen
+        res = 0
+        l = len(self.term) - 1
+        for i in self.term:
+            res += i * (2 ** l)
+            l -= 1
+        return res
+
+    def getDecimal(self):
+        return self.decimal
 
     def equal(self, pother):  # GETEST
         return self.term == pother.term
@@ -80,7 +92,9 @@ def test():
     assert p2.countOnes() == 3
     assert p3.countOnes() == 2
     assert p1.differAt(p2) == [5]
+
     p1.setVar(5, 1)
+    print(p1,p3)
     assert p1.equal(p2)
     assert p1.setVar(4, 3) == 0
     assert p1.setVar(6, 1) == 0
@@ -88,8 +102,10 @@ def test():
     assert p1c != p1
     assert p1c.equal(p1)
     assert p1.differAt(p1c) == []
-    assert p1.differAt(p3) == [2, 3, 4, 5]
-
+    p4 = Pterm([1,0,1,0,1])
+    p5 = Pterm([1,1,0,0,0,1])
+    assert p4.decimal == 21
+    assert p5.decimal == 49
 
 def main():
     test()

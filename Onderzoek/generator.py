@@ -1,6 +1,7 @@
 #################
 #   generator   #
 #################
+
 import random
 import time
 import csv
@@ -13,8 +14,8 @@ PVAR = [-1, 0, 1]
 
 def generator():  # returnt een random LExp met random grootte
     res = LExp([])
-    aantalVariabelen = random.randint(3, 8)
-    randomGrens = random.randint(1, 2 ** aantalVariabelen)
+    aantalVariabelen = 8
+    randomGrens = random.randint(64,127)
     while randomGrens > 0:
         newTerm = make_pterm(aantalVariabelen)
         if not res.containsTerm(newTerm):
@@ -34,21 +35,22 @@ def make_pterm(aantalVariabelen):  # make a random pterm
 def main():
     with open('dataOnderzoek.csv', 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["#PtermenStart", "VarCount", "MaxPterms", "ResPterms", "AvgVar/Term", "Time"])
+        writer.writerow(["#PtermenStart", "ResPterms", "AvgVar/Term", "Time"])
         i = 0
         while True:
             Expression = generator()
+            decimals = Expression.toDecimals()
             startPterms = Expression.countPterms()
-            varCount = Expression.countVariables()
-            maxPterms = 2**varCount
+        #    varCount = Expression.countVariables()
+        #   maxPterms = 2**varCount
             startTime = time.time()
-            print("Counter: {}, varCount: {}, maxPterms: {}".format(i, varCount, maxPterms))
+            print("Counter: {}, Start Ptermen: {}, decimalen: {} ".format(i, startPterms, decimals))
             vereenvoudigd = mcCluskey(Expression)
             endTime = time.time()
             elapsedTime = endTime - startTime
             endPterms = vereenvoudigd.countPterms()
             avgVarPerTerm = vereenvoudigd.averageVarPerTerm()
-            record = [startPterms, varCount, maxPterms, endPterms, avgVarPerTerm, elapsedTime]
+            record = [startPterms, endPterms, avgVarPerTerm, elapsedTime] + decimals
             writer.writerow(record)
             i += 1
 

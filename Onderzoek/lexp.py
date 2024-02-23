@@ -14,6 +14,16 @@ class LExp:
             assert type(pterm) == Pterm
         self.terms = PTerms
 
+    def toDecimals(self):
+        res = []
+        for i in range(2 ** 8):
+            res.append(0)
+        for term in self.terms:
+            res[term.getDecimal()] = 1
+        return res
+
+
+
     def countPterms(self):
         counter = 0
         for i in self.terms:
