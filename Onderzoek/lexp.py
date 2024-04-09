@@ -45,6 +45,22 @@ class LExp:
             return 0
         return varCounter / termCount
 
+    def averageVarTruePerStartterm(self):
+        avgTrueCount = 0
+        for i in self.terms:
+            varCounter = 0
+            trueVarCounter = i.countOnes()
+            varCounter += i.countOnes()
+            varCounter += i.countZeros()
+            if varCounter != 0:
+                avgTrue = trueVarCounter / varCounter
+                avgTrueCount += avgTrue
+
+        termCount = self.countPterms()
+        if termCount == 0:
+            return 0
+        return avgTrueCount / termCount
+  
     def changeTerm(self, term, i, ni):
         self.removeTerm(term)
         term.setVar(i, ni)
@@ -119,7 +135,7 @@ def test():
     exp4.changeTerm(Pterm([1, -1]), 0, 0)
     exp5 = LExp([Pterm([1, 0]), Pterm([1, 1]), Pterm([0, -1])])
     assert exp4.equal(exp5)
-
+    assert exp1.averageVarTruePerStartterm() == 0.75
 
 def main():
     test()

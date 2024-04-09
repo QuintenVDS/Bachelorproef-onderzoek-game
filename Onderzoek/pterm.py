@@ -58,12 +58,22 @@ class Pterm:
                 counter += 1
         return counter
 
+    def AvgVarTruePerStarterm(self):
+        return self.countOnes()/self.length
+
+
+
+
     def countZeros(self):
         counter = 0
         for i in self.term:
             if i == 0:
                 counter += 1
         return counter
+
+def AvgVarTrue(self):
+
+    
 
     def __copy__(self):  # GETEST
         return Pterm(self.term.copy())

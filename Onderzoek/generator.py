@@ -35,12 +35,14 @@ def make_pterm(aantalVariabelen):  # make a random pterm
 def main():
     with open('dataOnderzoek.csv', 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["#PtermenStart", "ResPterms", "AvgVar/Term", "Time"])
+        writer.writerow(["#PtermenStart", "ResPterms", "AvgVar/eindTerm", "Time", "AvgVarTrue/StartTerm"])
         i = 0
         while True:
             Expression = generator()
             decimals = Expression.toDecimals()
             startPterms = Expression.countPterms()
+
+            AvgVarTruePerStartTerm = Expression.averageVarTruePerStartterm()
         #    varCount = Expression.countVariables()
         #   maxPterms = 2**varCount
             startTime = time.time()
@@ -50,7 +52,7 @@ def main():
             elapsedTime = endTime - startTime
             endPterms = vereenvoudigd.countPterms()
             avgVarPerTerm = vereenvoudigd.averageVarPerTerm()
-            record = [startPterms, endPterms, avgVarPerTerm, elapsedTime] + decimals
+            record = [startPterms, endPterms, avgVarPerTerm, elapsedTime, AvgVarTruePerStartTerm] + decimals
             writer.writerow(record)
             i += 1
 
