@@ -7,19 +7,21 @@
 #       -   1  : de variabele komt voor in de p-term
 #       -   0  : de negatie van de variabele komt voor in de p-term
 #       -   -1 : de variabele komt niet voor in de p-term (maakt niet uit welke waarde die heeft)
-#   Het eerste element in de lijst stelt variabele x_0 voor, het tweede x_1, en zo verder.
+#   Het eerste element in de lijst stelt variabele x_0 voor, het tweede x_1, ...
 
 PVAR = [-1, 0, 1]
 
 
 class Pterm:
+
+    #   Returnt een nieuwe pterm, met variabelen varlist
     def __init__(self, varlist):  # GETEST
         for i in varlist:
             assert i in PVAR
         self.term = varlist
-        self.decimal = self.toDecimal()
         self.length = len(varlist)
 
+    #   Veranderd variabele i naar waarde ni
     def setVar(self, i, ni):  # GETEST
         if ni not in PVAR or i >= self.length:
             print("exception")
@@ -27,6 +29,7 @@ class Pterm:
         else:
             self.term[i] = ni
 
+    #   Geeft de decimale waarde van een niet geminimaliseerde term terug (term bevat geen -1)
     def toDecimal(self):  #Getest: werkt niet voor geminimaliseerde p-termen
         res = 0
         l = len(self.term) - 1
@@ -35,12 +38,11 @@ class Pterm:
             l -= 1
         return res
 
-    def getDecimal(self):
-        return self.decimal
-
+    #   Returnt true wanneer deze pterm gelijk is aan pother
     def equal(self, pother):  # GETEST
         return self.term == pother.term
 
+    #   Returnt een lijst met alle indexen waarop deze pterm verschilt van term2
     def differAt(self, term2):  # GETEST
         if self.length != term2.length:
             print("exception")
@@ -51,29 +53,34 @@ class Pterm:
                 res.append(i)
         return res
 
+    #   Geeft het aantal variabelen dat 1 (= true) zijn
     def countOnes(self):  # GETEST
-        counter = 0
-        for i in self.term:
-            if i == 1:
-                counter += 1
-        return counter
+        return self.countValue(1)
 
-    def AvgVarTruePerStarterm(self):
-        return self.countOnes()/self.length
-
-
-
-
+    #   Geeft het aantal variabelen dat 0 (= false) zijn
     def countZeros(self):
+        return self.countValue(0)
+
+    def countValue(self, value):
         counter = 0
         for i in self.term:
-            if i == 0:
+            if i == value:
                 counter += 1
         return counter
 
-def AvgVarTrue(self):
-
-    
+    #   Breidt deze term uit door een variabelen -1 te vervangen door 0 in een term
+    #   en 1 in de andere term
+    def expand(self, res = []):
+        exp1 = self.__copy__()
+        exp2 = self.__copy__()
+        if self.countValue(-1) > 0:
+            for i in range(len(self.term)):
+                if self.term[i] == -1:
+                    exp1.setVar(i, 0)
+                    exp2.setVar(i, 1)
+                    break
+            return [exp1, exp2]
+        return [exp1]
 
     def __copy__(self):  # GETEST
         return Pterm(self.term.copy())
@@ -91,7 +98,6 @@ def AvgVarTrue(self):
 #################
 #   TESTCASES   #
 #################
-
 
 def test():
     p1 = Pterm([1, 0, -1, 1, 0, 0])
@@ -114,12 +120,7 @@ def test():
     assert p1.differAt(p1c) == []
     p4 = Pterm([1,0,1,0,1])
     p5 = Pterm([1,1,0,0,0,1])
-    assert p4.decimal == 21
-    assert p5.decimal == 49
-
-def main():
-    test()
 
 
 if __name__ == '__main__':
-    main()
+    test()

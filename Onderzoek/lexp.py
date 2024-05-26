@@ -7,34 +7,35 @@ from Onderzoek.pterm import *
 #   Een logische expressie wordt voorgesteld met de klasse LExp. Deze klasse heeft
 #   1 veld self.terms. Dit is een lijst van Ptermen
 
-
 class LExp:
-    def __init__(self, PTerms):  # GETEST
-        for pterm in PTerms:
-            assert type(pterm) == Pterm
-        self.terms = PTerms
 
-    def toDecimals(self):
-        res = []
-        for i in range(2 ** 8):
-            res.append(0)
-        for term in self.terms:
-            res[term.getDecimal()] = 1
-        return res
+    #   Geeft een nieuwe expressie terug met de gegeven ptermen
+    def __init__(self, pTerms):  # GETEST
+        try:
+            varCount = pTerms[0].length
+            for pterm in pTerms:
+                assert type(pterm) == Pterm
+                assert(pterm.length == varCount)
+            self.terms = pTerms
+        except Exception as e:
+            assert e.__str__() == "list index out of range"
+        finally:
+            self.terms = pTerms
 
-
-
+    #   Geeft het aantal ptermen terug
     def countPterms(self):
         counter = 0
         for i in self.terms:
             counter += 1
         return counter
 
+    #   Geeft het aantal variabelen in de expressie
     def countVariables(self):
         if self.countPterms() > 0:
             return self.terms[0].length
         return None
 
+    #   Het gemiddeld aantal variabelen (dat 1 of 0 zijn) per term
     def averageVarPerTerm(self):
         varCounter = 0
         for i in self.terms:
@@ -45,38 +46,24 @@ class LExp:
             return 0
         return varCounter / termCount
 
-    def averageVarTruePerStartterm(self):
-        avgTrueCount = 0
-        for i in self.terms:
-            varCounter = 0
-            trueVarCounter = i.countOnes()
-            varCounter += i.countOnes()
-            varCounter += i.countZeros()
-            if varCounter != 0:
-                avgTrue = trueVarCounter / varCounter
-                avgTrueCount += avgTrue
-
-        termCount = self.countPterms()
-        if termCount == 0:
-            return 0
-        return avgTrueCount / termCount
-  
+    #   Veranderd de i-de variabelen in pterm term naar ni
     def changeTerm(self, term, i, ni):
-        self.removeTerm(term)
-        term.setVar(i, ni)
-        self.appendTerm(term)
+        if self.containsTerm(term):
+            self.removeTerm(term)
+            term.setVar(i, ni)
+            self.appendTerm(term)
 
-    def setTerms(self, nterms):  # GETEST
-        self.terms = nterms
-
+    #   Verwijdert pterm term uit de expressie
     def removeTerm(self, term):  # GETEST
         for origterm in self.terms:
             if origterm.equal(term):
                 self.terms.remove(origterm)
 
+    #   Voegt pterm term toe aan de expressie
     def appendTerm(self, term):  # GETEST
         self.terms.append(term)
 
+    #   Geeft true terug wanneer de expressie pterm term bevat
     def containsTerm(self, term):  # GETEST
         found = False
         for origterm in self.terms:
@@ -85,6 +72,30 @@ class LExp:
                 break
         return found
 
+    #   Geeft een expressie terug die dezelfde logische uitdrukking voorstelt maar
+    #   waar elke term een toekenning (1 of 0) heeft voor elke variabelen
+    def expand(self):
+        res = LExp([])
+        for term in self.terms:
+            if term.countValue(-1) > 0:
+                expandedTerms = term.expand()
+                for expandedTerm in expandedTerms:
+                    res.appendTerm(expandedTerm)
+            else:
+                res.appendTerm(term)
+
+        if res.isExpanded():
+            return res
+        return res.expand()
+
+    #   Geeft true terug wanneer elke term een toekenning heeft (0 of 1) voor elke variabelen
+    def isExpanded(self):
+        for term in self.terms:
+            if term.countValue(-1) > 0:
+                return False
+        return True
+
+    #   Geeft true terug wanneer de expressies dezelfde termen bevatten (volgorde maakt niet uit)
     def equal(self, other):  # GETEST
         if type(other) != LExp:
             return False
@@ -95,6 +106,7 @@ class LExp:
                 return False
         return True
 
+    #   Geeft een kopies terug van de expressies, met kopies van de ptermen
     def deepcopyExp(self):  # GETEST
         res = []
         for i in self.terms:
@@ -116,7 +128,6 @@ class LExp:
 #   TESTCASES   #
 #################
 
-
 def test():
     exp1 = LExp([Pterm([1, 0]), Pterm([1, 1])])
     exp2 = LExp([Pterm([1, -1]), Pterm([1, 0])])
@@ -135,7 +146,6 @@ def test():
     exp4.changeTerm(Pterm([1, -1]), 0, 0)
     exp5 = LExp([Pterm([1, 0]), Pterm([1, 1]), Pterm([0, -1])])
     assert exp4.equal(exp5)
-    assert exp1.averageVarTruePerStartterm() == 0.75
 
 def main():
     test()

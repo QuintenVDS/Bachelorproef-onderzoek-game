@@ -4,6 +4,7 @@ from Onderzoek.lexp import *
 #   Algoritme   #
 #################
 
+#   Lost de gegeven logische expressie canExp op met het algoritme van Quine-McCluskey
 def mcCluskey(canExp):  # GETEST
     newIter = True
     while newIter:
@@ -24,9 +25,21 @@ def mcCluskey(canExp):  # GETEST
             newIter = False
         else:
             canExp = newTerms
+
+    #   Vindt de essentiële ptermen
+    #   Termen die niets bijdragen aan de oplossing kunnen verwijderd worden
+    allTerms = canExp.expand()
+    for i in range(canExp.countPterms()):
+        solCopy = canExp.deepcopyExp()
+        solCopy.removeTerm(canExp.terms[i])
+        if solCopy.expand().equal(allTerms):
+            canExp.removeTerm(canExp.terms[i])
+            i -= 1
+
     return canExp
 
 
+#   Maakt een dictionary die de termen van de gegeven expressies sorteert op het aantal eentjes
 def makeTable(canExp):  # GETEST
     res = dict()
     for i in canExp:
@@ -38,6 +51,8 @@ def makeTable(canExp):  # GETEST
     return dict(sorted(res.items()))
 
 
+#   Geeft een nieuwe pterm terug die ptermen term1 en term2 reduceert naart 1 term
+#   @pre :  len(term1.differAt(term2)) == 1
 def reduce(term1, term2, i):  # GETEST
     if term1.length != term2.length:
         print("exception")
