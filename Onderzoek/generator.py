@@ -12,10 +12,10 @@ from Onderzoek.McCLUSKEY import *
 PVAR = [-1, 0, 1]
 
 #   Het aantal variabelen waarmee expressies worden gegenereed
-VARCOUNT = 6
+VARCOUNT = 8
 
 #   De kans dat een variabele in de gegenereerde pterm op false (= 0) wordt gezet
-CHANCE_FALSE = 0.3
+CHANCE_FALSE = 0.5
 
 
 #   Geeft een random expressie terug met een willekeurig aantal ptermen (tussen 1 en 2 ^ VARCOUNT)
@@ -48,7 +48,7 @@ def make_pterm():  # make a random pterm
 def main():
     with open('dataOnderzoek.csv', 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["#PtermenStart", "ResPterms", "AvgVar/eindTerm", "Time", "AvgVarTrue/StartTerm"])
+        writer.writerow(["#PtermenStart", "ResPterms", "AvgVar/eindTerm", "Time"])
         i = 0
         while True:
             Expression = generator()
